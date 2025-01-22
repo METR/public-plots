@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import pathlib
 from typing import Sequence
 
@@ -82,7 +83,7 @@ def plot_logistic_regression(
     ax.set_ylabel("Probability of success")
     src.utils.plots.create_sorted_legend(ax, plot_params["legend_order"])
 
-    output_file.parent.mkdir(exist_ok=True, parents=True)
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     fig.savefig(output_file)
     logging.info(f"Saved plot to {output_file}")
 

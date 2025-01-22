@@ -9,7 +9,7 @@ import pandas as pd
 import src.stats.statistics
 import src.utils.plots
 
-logger = logging.getLogger("public_plots.wrangle_bar_by_time_allocation")
+logger = logging.getLogger("eval_pipeline.wrangle_bar_by_time_allocation")
 
 
 _MAX_TIME_LIMIT_IN_SECONDS = 8 * 60 * 60
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s")
-    logging.getLogger("public_plots").setLevel(
+    logging.getLogger("eval_pipeline").setLevel(
         logging.DEBUG if args.pop("verbose") else logging.INFO
     )
 

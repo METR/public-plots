@@ -1,11 +1,9 @@
 # %%
-from collections import Counter, defaultdict
-
+import pytest
 import numpy as np
 import pandas as pd
-import pytest
-
 from src.wrangle.bootstrap import bootstrap_sample
+from collections import Counter, defaultdict
 
 
 def generate_synthetic_data(n_samples: int, seed: int) -> pd.DataFrame:
