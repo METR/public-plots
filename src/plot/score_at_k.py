@@ -196,7 +196,6 @@ def plot_score_at_k(
         plt.close()
         return
 
-    output_path.parent.mkdir(exist_ok=True, parents=True)
     plt.savefig(output_path, format=plot_format)
     logging.info(f"Plot saved to {output_path}")
 

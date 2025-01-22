@@ -1,8 +1,0 @@
-[core]
-    remote = s3
-[cache]
-    type = "reflink,hardlink,symlink"
-['remote "s3"']
-    url = s3://production-analysis-assets
-[parsing]
-    bool = boolean_optional
