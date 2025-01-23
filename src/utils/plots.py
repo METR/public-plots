@@ -1,6 +1,9 @@
+import logging
+import pathlib
 from typing import TypedDict
 
 import matplotlib.axes
+import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
 
@@ -106,3 +109,15 @@ def create_sorted_legend(ax: matplotlib.axes.Axes, legend_order: list[str]) -> N
     handles, labels = zip(*legend_elements)
 
     ax.legend(handles=handles, labels=labels)
+
+
+def save_or_open_plot(
+    output_file: pathlib.Path | None = None, plot_format: str = "png"
+) -> None:
+    if output_file:
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_file, format=plot_format, bbox_inches="tight")
+        logging.info(f"Plot saved to {output_file}")
+    else:
+        plt.show()
+    plt.close()

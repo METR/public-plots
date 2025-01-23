@@ -4,6 +4,7 @@ import pathlib
 from datetime import date
 from typing import List
 
+import dvc.api
 import numpy as np
 import pandas as pd
 import yaml
@@ -12,6 +13,7 @@ from matplotlib.axes import Axes
 from matplotlib.dates import date2num
 from matplotlib.figure import Figure
 
+import src.utils.plots
 from src.plot.logistic import plot_trendline
 
 logger = logging.getLogger(__name__)
@@ -196,7 +198,6 @@ def main() -> None:
     parser.add_argument("--weighting", type=str, required=True)
     parser.add_argument("--categories", type=str, required=True)
     parser.add_argument("--regularization", type=str, required=True)
-    parser.add_argument("--plot-format", type=str, default="png")
     parser.add_argument("--log-level", type=str, default="INFO")
     parser.add_argument(
         "--n-samples", type=int, default=10, help="Number of sample lines to plot"
@@ -210,6 +211,8 @@ def main() -> None:
         level=args.log_level.upper(),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+    params = dvc.api.params_show(stages=["plot_bar_chart"])
 
     # Load data
     bootstrap_results = pd.read_csv(args.input_file)
@@ -251,9 +254,7 @@ def main() -> None:
     axs[1].set_ylim(0, None)
 
     # Save plot
-    args.output_file.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(args.output_file, bbox_inches="tight")
-    logging.info(f"Saved plot to {args.output_file}")
+    src.utils.plots.save_or_open_plot(args.output_file, params["plot_format"])
 
 
 if __name__ == "__main__":

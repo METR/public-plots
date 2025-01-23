@@ -27,10 +27,7 @@ def _calculate_bar_positions(
 
 
 def plot_bar_by_time_allocation(
-    plot_params: src.utils.plots.PlotParams,
-    data: pd.DataFrame,
-    output_path: pathlib.Path,
-    plot_format: str = "png",
+    plot_params: src.utils.plots.PlotParams, data: pd.DataFrame
 ) -> None:
     fig, ax = plt.subplots()
 
@@ -155,14 +152,6 @@ def plot_bar_by_time_allocation(
 
     plt.tight_layout()
 
-    if output_path:
-        output_path.parent.mkdir(exist_ok=True, parents=True)
-        plt.savefig(output_path, format=plot_format, bbox_inches="tight")
-        logging.info(f"Plot saved to {output_path}")
-    else:
-        plt.show()
-    plt.close()
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Plot mean scores by width over time.")
@@ -182,12 +171,6 @@ def main() -> None:
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Set the logging level.",
     )
-    parser.add_argument(
-        "--plot-format",
-        default="png",
-        choices=["png", "svg", "jpg"],
-        help="Format to save plots in",
-    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -200,7 +183,9 @@ def main() -> None:
 
     logging.info(f"Plotting to {args.output}")
     params = dvc.api.params_show(stages="plot_bar_by_time_allocation")
-    plot_bar_by_time_allocation(params["plots"], data, args.output, args.plot_format)
+    plot_bar_by_time_allocation(params["plots"], data)
+
+    src.utils.plots.save_or_open_plot(args.output, params["plot_format"])
 
 
 if __name__ == "__main__":

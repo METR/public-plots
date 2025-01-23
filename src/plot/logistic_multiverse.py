@@ -194,7 +194,6 @@ def main() -> None:
     parser.add_argument("--input-file-prefix", type=str, required=True)
     parser.add_argument("--release-dates", type=pathlib.Path, required=True)
     parser.add_argument("--output-file", type=pathlib.Path, required=True)
-    parser.add_argument("--plot-format", type=str, default="png")
     parser.add_argument("--log-level", type=str, default="INFO")
     parser.add_argument("--weightings", type=str, required=True)
     parser.add_argument("--regularizations", type=str, required=True)
@@ -206,6 +205,8 @@ def main() -> None:
         level=args.log_level.upper(),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+    params = dvc.api.params_show(stages="plot_logistic_multiverse")
 
     weightings = args.weightings.split(",")
     regularizations = args.regularizations.split(",")
@@ -224,7 +225,7 @@ def main() -> None:
         agent_summaries["release_date"] = agent_summaries["agent"].map(
             release_dates["date"]
         )
-        params = dvc.api.params_show(stages="plot_logistic_multiverse")
+
         focus_agents = [
             "Claude 3 Opus",
             "Claude 3.5 Sonnet (New)",
@@ -265,12 +266,10 @@ def main() -> None:
         fontsize=10,
     )
 
-    args.output_file.parent.mkdir(parents=True, exist_ok=True)
     record_metrics(records, args.metrics_file)
     logging.info(f"Saved metrics to {args.metrics_file}")
 
-    fig.savefig(args.output_file)
-    logging.info(f"Saved plot to {args.output_file}")
+    src.utils.plots.save_or_open_plot(args.output_file, params["plot_format"])
 
 
 if __name__ == "__main__":

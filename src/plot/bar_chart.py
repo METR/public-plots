@@ -157,7 +157,6 @@ def main(
     params: dict[str, Any],
     boot_set: str,
     log_level: str,
-    plot_format: str,
     weighting: str,
     pass_at_k_sampling: int | None = None,
 ) -> None:
@@ -179,7 +178,7 @@ def main(
 
     print(df)
 
-    fig = overall_bar_chart_weighted(
+    overall_bar_chart_weighted(
         params["plots"],
         df,
         focus_agents=[
@@ -191,8 +190,7 @@ def main(
         show=False,
     )
 
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_file)
+    src.utils.plots.save_or_open_plot(output_file, params["plot_format"])
 
 
 if __name__ == "__main__":
@@ -203,7 +201,6 @@ if __name__ == "__main__":
     parser.add_argument("--boot-set", type=str, required=True)
     parser.add_argument("--pass-at-k-sampling", required=False)
     parser.add_argument("--log-level", type=str, required=False)
-    parser.add_argument("--plot-format", type=str, required=False)
     parser.add_argument("--weighting", type=str, required=False)
     args = parser.parse_args()
     if args.pass_at_k_sampling == "None":

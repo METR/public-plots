@@ -1,11 +1,11 @@
 import argparse
 import logging
 import pathlib
-from typing import Dict, List
+from typing import List, Dict
+from joblib import Parallel, delayed
 
 import numpy as np
 import pandas as pd
-from joblib import Parallel, delayed
 
 from src.wrangle.logistic import get_x_for_quantile, unscaled_regression
 

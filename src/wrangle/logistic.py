@@ -126,7 +126,7 @@ def agent_regression(
 
     logging.info(f"Analyzing {agent_name}, method {method}")
     time_buckets = [1, 4, 16, 64, 256, 960]
-    y = np.clip(y, 0, 1)
+    assert np.all((y >= 0) & (y <= 1)), "y values must be in [0,1]"
     x = np.log2(x).reshape(-1, 1)
     if weights is None:
         weights = np.ones_like(y, dtype=np.float64)
