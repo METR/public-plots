@@ -154,8 +154,6 @@ def plot_score_at_k(
     data: pd.DataFrame,
     human_mean_of_percentiles: pd.DataFrame,
     plot_params: src.utils.plots.PlotParams,
-    output_path: Path | None = None,
-    plot_format: str = "png",
 ) -> None:
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -191,15 +189,6 @@ def plot_score_at_k(
 
     plt.tight_layout()
 
-    if not output_path:
-        plt.show()
-        plt.close()
-        return
-
-    output_path.parent.mkdir(exist_ok=True, parents=True)
-    plt.savefig(output_path, format=plot_format)
-    logging.info(f"Plot saved to {output_path}")
-
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -226,12 +215,6 @@ def main() -> None:
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
     )
-    parser.add_argument(
-        "--plot-format",
-        default="png",
-        choices=["png", "svg", "jpg"],
-        help="Format to save plots in",
-    )
     args = parser.parse_args()
     params = dvc.api.params_show(stages="plot_score_at_k")
 
@@ -250,21 +233,16 @@ def main() -> None:
         f"Loaded human mean of percentiles from {args.input_human_mean_of_percentiles}"
     )
 
-    args.output_prefix.parent.mkdir(parents=True, exist_ok=True)
-
     for time_limit in sorted(data["time_limit"].unique()):
         time_limit_data = data[data["time_limit"] == time_limit]
+        plot_score_at_k(time_limit_data, human_mean_of_percentiles, params["plots"])
+
+        plot_format = params["plot_format"]
         output_path = (
             args.output_prefix.parent
-            / f"{args.output_prefix.name}_{time_limit}.{args.plot_format}"
+            / f"{args.output_prefix.name}_{time_limit}.{plot_format}"
         )
-        plot_score_at_k(
-            time_limit_data,
-            human_mean_of_percentiles,
-            params["plots"],
-            output_path,
-            args.plot_format,
-        )
+        src.utils.plots.save_or_open_plot(output_path, plot_format)
 
 
 if __name__ == "__main__":

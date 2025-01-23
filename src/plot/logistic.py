@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import os
 import pathlib
 from typing import Any, Sequence, cast
 
@@ -207,10 +206,6 @@ def plot_horizon_graph(
         # next annotation will go below this one
         y -= line_height * n_lines + padding
 
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    fig.savefig(output_file)
-    logging.info(f"Saved plot to {output_file}")
-
 
 def fit_trendline(
     agent_summaries: pd.DataFrame,
@@ -362,7 +357,6 @@ def main() -> None:
     parser.add_argument("--release-dates", type=pathlib.Path, required=True)
     parser.add_argument("--output-file", type=pathlib.Path, required=True)
     parser.add_argument("--weighting", type=str)
-    parser.add_argument("--plot-format", type=str, default="png")
     parser.add_argument("--log-level", type=str, default="INFO")
     parser.add_argument("--trendlines", type=str, default="true")
     parser.add_argument("--after-date", type=str, default="2022-06-01")
@@ -396,7 +390,9 @@ def main() -> None:
     logging.info("Loaded input data")
     trendlines = args.trendlines.lower() == "true"
 
-    weighting_list = dvc.api.params_show()["weighting"]
+    params = dvc.api.params_show(stages="plot_logistic_regression")
+
+    weighting_list = params["weighting"]
     weighting = next(w for w in weighting_list if w["weight_col"] == args.weighting)
     subtitle = weighting["graph_snippet"]
 
@@ -406,7 +402,7 @@ def main() -> None:
         runs_df = None
 
     plot_horizon_graph(
-        dvc.api.params_show(stages="plot_logistic_regression")["plots"],
+        params["plots"],
         agent_summaries,
         runs_df=runs_df,
         output_file=args.output_file,
@@ -417,6 +413,8 @@ def main() -> None:
         include_task_distribution=args.include_task_distribution,
         weight_key=weighting["weight_col"],
     )
+
+    src.utils.plots.save_or_open_plot(args.output_file, params["plot_format"])
 
 
 if __name__ == "__main__":

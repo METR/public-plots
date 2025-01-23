@@ -26,7 +26,6 @@ def plot_logistic_function(
 def plot_logistic_regression(
     plot_params: src.utils.plots.PlotParams,
     agent_summaries: pd.DataFrame,
-    output_file: pathlib.Path,
     focus_agents: Sequence[str],
     show_example_p50: bool = False,
     show_empirical_rates: bool = False,
@@ -82,16 +81,11 @@ def plot_logistic_regression(
     ax.set_ylabel("Probability of success")
     src.utils.plots.create_sorted_legend(ax, plot_params["legend_order"])
 
-    output_file.parent.mkdir(exist_ok=True, parents=True)
-    fig.savefig(output_file)
-    logging.info(f"Saved plot to {output_file}")
-
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-file", type=pathlib.Path, required=True)
     parser.add_argument("--output-file", type=pathlib.Path, required=True)
-    parser.add_argument("--plot-format", type=str, default="png")
     parser.add_argument("--log-level", type=str, default="INFO")
     args = parser.parse_args()
 
@@ -101,7 +95,6 @@ def main() -> None:
     )
 
     agent_summaries = pd.read_csv(args.input_file)
-    # plot_params = dvc.api.params_show("plot_logistic_regression")
     params = dvc.api.params_show(stages="plot_logistic_individual")
     focus_agents = [
         "Claude 3.5 Sonnet (New)",
@@ -119,11 +112,12 @@ def main() -> None:
     plot_logistic_regression(
         params["plots"],
         agent_summaries,
-        args.output_file,
         focus_agents,
         show_empirical_rates=True,
         show_example_p50=False,
     )
+
+    src.utils.plots.save_or_open_plot(args.output_file, params["plot_format"])
 
 
 if __name__ == "__main__":

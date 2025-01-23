@@ -124,7 +124,6 @@ stages:
       python -m src.plot.bar_chart
       --metrics-file data/wrangled/logistic_regression_${item.weighting}_${item.regularization}_ftr.csv
       --output-file plots/bar_chart/${item.weighting}.${plot_format}
-      --plot-format ${plot_format}
       --log-level ${log_level}
       --weighting ${item.weighting}
       --boot-set ${item.boot_set}
@@ -147,7 +146,6 @@ stages:
       python -m src.plot.bar_by_time_allocation
       --input data/processed/wrangled/bar_by_time_allocation.jsonl
       --output plots/bar_by_time_allocation.${plot_format}
-      --plot-format ${plot_format}
       --log-level ${log_level}
     deps:
       - data/processed/wrangled/bar_by_time_allocation.jsonl
@@ -168,7 +166,6 @@ stages:
       --input-score-at-k data/processed/wrangled/score_at_k.jsonl
       --input-human-mean-of-percentiles data/processed/wrangled/human_mean_of_percentiles.jsonl
       --output-prefix plots/aird/score_at_k
-      --plot-format ${plot_format}
       --log-level ${log_level}
     deps:
       - src/plot/score_at_k.py
@@ -227,7 +224,6 @@ stages:
       --release-dates data/external/release_dates.yaml
       --output-file plots/logistic/logistic_multiverse.${plot_format}
       --metrics-file metrics/horizon_trend/multiverse.yaml
-      --plot-format ${plot_format}
       --log-level ${log_level}
       --weightings "equal_task_weight,invsqrt_task_weight"
       --regularization "0.1,0.01"
@@ -256,7 +252,6 @@ stages:
       python -m src.plot.logistic_individual
       --input-file data/wrangled/logistic_regression_${item.weighting}_${item.regularization}_ftr.csv
       --output-file plots/logistic_individual/${item.weighting}-${item.regularization}.${plot_format}
-      --plot-format ${plot_format}
       --log-level ${log_level}
     deps:
       - src/plot/logistic_individual.py
@@ -285,7 +280,6 @@ stages:
       --weighting ${item.weighting}
       --categories ${item.categories}
       --regularization ${item.regularization}
-      --plot-format ${plot_format}
       --log-level ${log_level}
       --n-samples 60
       --after-date ${item.after_date}
