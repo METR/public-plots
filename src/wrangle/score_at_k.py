@@ -75,7 +75,7 @@ def prepare_plot_data(
                         f"Task {task_id} has {num_runs} samples, less than requested {samples}"
                     )
                 if (
-                    task_id != "ai_rd_small_scaling_law"
+                    task_id != "ai_rd_small_scaling_law/main"
                     and num_runs < min_runs_available
                 ):
                     min_runs_available = num_runs
