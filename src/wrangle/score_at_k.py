@@ -2,6 +2,7 @@ import argparse
 import logging
 from pathlib import Path
 
+import dvc.api
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -75,7 +76,7 @@ def prepare_plot_data(
                         f"Task {task_id} has {num_runs} samples, less than requested {samples}"
                     )
                 if (
-                    task_id != "ai_rd_small_scaling_law"
+                    task_id != "ai_rd_small_scaling_law/main"
                     and num_runs < min_runs_available
                 ):
                     min_runs_available = num_runs
@@ -136,13 +137,6 @@ def main() -> None:
         help="Number of bootstrap samples",
     )
     parser.add_argument(
-        "--time-limits",
-        type=int,
-        nargs="+",
-        default=[1800],
-        help="Time limits to select",
-    )
-    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
@@ -159,8 +153,12 @@ def main() -> None:
     df = pd.read_json(args.input_score_at_k, lines=True)
 
     logging.info("Preparing plot data")
+    params = dvc.api.params_show()
     wrangled_data = prepare_plot_data(
-        df, args.samples, args.time_limits, args.n_bootstrap
+        df,
+        args.samples,
+        params["rebench_best_of_k_parameters"]["time_limits"],
+        args.n_bootstrap,
     )
 
     logging.info(f"Saving wrangled data to {args.output_score_at_k}")

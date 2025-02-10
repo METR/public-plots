@@ -12,9 +12,6 @@ import src.utils.plots
 logger = logging.getLogger("eval_pipeline.wrangle_bar_by_time_allocation")
 
 
-_MAX_TIME_LIMIT_IN_SECONDS = 8 * 60 * 60
-
-
 def wrangle_bar_by_time_allocation(
     runs_file: pathlib.Path,
     wrangled_file: pathlib.Path,
@@ -26,13 +23,14 @@ def wrangle_bar_by_time_allocation(
     """
     df_runs = pd.read_json(runs_file, lines=True)
 
-    params = dvc.api.params_show(stages="wrangle_bar_by_time_allocation")
+    params = dvc.api.params_show()
+    bok_params = params["rebench_best_of_k_parameters"]
     n_bootstrap = params["n_bootstrap"]
-    time_limits = params["stages"]["wrangle_bar_by_time_allocation"]["time_limits"]
+    time_limits = bok_params["time_limits"]
 
     data_wrangled = []
     for time_limit in time_limits:
-        k = _MAX_TIME_LIMIT_IN_SECONDS // time_limit
+        k = bok_params["max_time_limit_in_seconds"] // time_limit
         df_time_limit = df_runs.loc[df_runs["time_limit"] == time_limit, :]
         time_limit_label = src.utils.plots.format_time_label(time_limit)
         time_label = f"{time_limit_label} @ {k}"

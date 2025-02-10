@@ -58,20 +58,25 @@ possible_ticks = np.array(
 )
 
 
-def log_x_axis(ax: matplotlib.axes.Axes, low_limit_seconds: int | None = None) -> None:
+def log_x_axis(
+    ax: matplotlib.axes.Axes, low_limit: int | None = None, unit: str = "minutes"
+) -> None:
     ax.set_xscale("log")
     x_min, x_max = ax.get_xlim()
 
-    if low_limit_seconds is not None:
-        x_min = max(x_min, low_limit_seconds / 3600)
+    multiplier = 60 if unit == "minutes" else 3600
+    if low_limit is not None:
+        x_min = max(x_min, low_limit / multiplier)
         ax.set_xlim(left=x_min)
 
     xticks = possible_ticks[(possible_ticks >= x_min) & (possible_ticks <= x_max)]
-    labels = [format_time_label(tick * 3600) for tick in xticks]
+    labels = [format_time_label(tick * multiplier) for tick in xticks]
 
     ax.set_xticks(xticks)
     ax.set_xticklabels(labels)
-    ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator(xticks))  # type: ignore[reportArgumentType]
+    ax.xaxis.set_major_locator(
+        matplotlib.ticker.FixedLocator([float(x) for x in xticks])
+    )
     ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
 
 

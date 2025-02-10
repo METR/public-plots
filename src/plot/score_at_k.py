@@ -185,7 +185,7 @@ def plot_score_at_k(
 
     handles, labels = zip(*[(elem[0], elem[1]) for elem in legend_elements])
 
-    _configure_plot_axes(ax, data, handles, labels, time_limit_label, time_limit)
+    _configure_plot_axes(ax, data, handles, labels, time_limit_label, time_limit)  # type: ignore
 
     plt.tight_layout()
 
@@ -211,6 +211,11 @@ def main() -> None:
         help="Prefix path for output files (will append _<time_limit>.png)",
     )
     parser.add_argument(
+        "--time-limit",
+        type=int,
+        required=True,
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
@@ -233,16 +238,15 @@ def main() -> None:
         f"Loaded human mean of percentiles from {args.input_human_mean_of_percentiles}"
     )
 
-    for time_limit in sorted(data["time_limit"].unique()):
-        time_limit_data = data[data["time_limit"] == time_limit]
-        plot_score_at_k(time_limit_data, human_mean_of_percentiles, params["plots"])
+    time_limit_data = data[data["time_limit"] == args.time_limit]
+    plot_score_at_k(time_limit_data, human_mean_of_percentiles, params["plots"])
 
-        plot_format = params["plot_format"]
-        output_path = (
-            args.output_prefix.parent
-            / f"{args.output_prefix.name}_{time_limit}.{plot_format}"
-        )
-        src.utils.plots.save_or_open_plot(output_path, plot_format)
+    plot_format = params["plot_format"]
+    output_path = (
+        args.output_prefix.parent
+        / f"{args.output_prefix.name}_{args.time_limit}.{plot_format}"
+    )
+    src.utils.plots.save_or_open_plot(output_path, plot_format)
 
 
 if __name__ == "__main__":
