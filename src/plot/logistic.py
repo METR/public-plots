@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import pathlib
-from typing import Any, Sequence, cast
+from typing import Any, cast
 
 import dvc.api
 import matplotlib.axes
@@ -60,14 +60,14 @@ def plot_horizon_graph(
     runs_df: pd.DataFrame | None,
     output_file: pathlib.Path,
     subtitle: str,
-    focus_agents: Sequence[str],
     trendlines: bool = True,
     after_date: str = "2022-06-01",
     include_task_distribution: str = "none",
     weight_key: str | None = None,
 ) -> None:
     agent_summaries = agent_summaries[
-        agent_summaries["agent"].isin(focus_agents)
+        pd.to_datetime(agent_summaries["release_date"])
+        >= (pd.Timestamp(after_date) - pd.Timedelta(days=365))
     ].copy()
     if include_task_distribution != "none":
         fig = plt.figure(figsize=(12, 6))
@@ -165,7 +165,8 @@ def plot_horizon_graph(
 
     # The graph is too busy if we have both trendlines and legend
     if not trendlines:
-        src.utils.plots.create_sorted_legend(ax, plot_params["legend_order"])
+        legend_order = agent_summaries.sort_values("release_date")["agent"].tolist()
+        src.utils.plots.create_sorted_legend(ax, legend_order)
 
     if (
         include_task_distribution != "none"
@@ -374,18 +375,6 @@ def main() -> None:
     agent_summaries["release_date"] = agent_summaries["agent"].map(
         release_dates["date"]
     )
-    focus_agents = [
-        "Claude 3 Opus",
-        "Claude 3.5 Sonnet (New)",
-        "Claude 3.5 Sonnet (Old)",
-        "GPT-4 0314",
-        "GPT-4 Turbo",
-        "GPT-4o",
-        # "davinci-002",
-        "gpt-3.5-turbo-instruct",
-        "o1",
-        "o1-preview",
-    ]
 
     logging.info("Loaded input data")
     trendlines = args.trendlines.lower() == "true"
@@ -406,7 +395,6 @@ def main() -> None:
         agent_summaries,
         runs_df=runs_df,
         output_file=args.output_file,
-        focus_agents=focus_agents,
         trendlines=trendlines,
         after_date=args.after_date,
         subtitle=subtitle,

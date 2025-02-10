@@ -36,7 +36,7 @@ stages:
       - src/wrangle/bar_by_time_allocation.py
     params:
       - n_bootstrap
-      - stages.wrangle_bar_by_time_allocation
+      - rebench_best_of_k_parameters
     outs:
       - data/processed/wrangled/bar_by_time_allocation.jsonl
     desc: Compute mean scores and hierarchical confidence intervals for final time limit.
@@ -62,13 +62,13 @@ stages:
       --input-score-at-k data/processed/runs/aird.jsonl
       --output-score-at-k data/processed/wrangled/score_at_k.jsonl
       --n-bootstrap ${n_bootstrap}
-      --time-limits 1800 7200
     deps:
       - src/wrangle/score_at_k.py
       - data/processed/runs/aird.jsonl
     params:
       - log_level
       - n_bootstrap
+      - rebench_best_of_k_parameters
     outs:
       - data/processed/wrangled/score_at_k.jsonl
 
@@ -161,11 +161,14 @@ stages:
     desc: Generate plot of mean scores for different time limits with confidence intervals.
 
   plot_score_at_k:
+    matrix:
+      time_limit: ${rebench_best_of_k_parameters.time_limits}
     cmd: >-
       python -m src.plot.score_at_k
       --input-score-at-k data/processed/wrangled/score_at_k.jsonl
       --input-human-mean-of-percentiles data/processed/wrangled/human_mean_of_percentiles.jsonl
       --output-prefix plots/aird/score_at_k
+      --time-limit ${item.time_limit}
       --log-level ${log_level}
     deps:
       - src/plot/score_at_k.py
@@ -177,9 +180,9 @@ stages:
       - log_level
       - plot_format
       - plots
+      - rebench_best_of_k_parameters
     plots:
-      - plots/aird/score_at_k_1800.${plot_format}
-      - plots/aird/score_at_k_7200.${plot_format}
+      - plots/aird/score_at_k_${item.time_limit}.${plot_format}
     desc: Generate plot of score at k for different time limits.
 
   plot_logistic_regression:

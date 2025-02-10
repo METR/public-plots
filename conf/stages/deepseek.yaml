@@ -1,0 +1,2 @@
+wrangle_bar_by_time_allocation:
+  time_limits: [1800, 7200, 28800]

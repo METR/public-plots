@@ -1,0 +1,101 @@
+defaults:
+  - _self_
+  - report: overtime
+  - stages: ${report}
+log_level: INFO
+n_bootstrap: 1_000
+plot_format: png
+
+weighting:
+  - weight_col: equal_task_weight
+    graph_snippet: Equally weighted tasks
+  - weight_col: invsqrt_task_weight
+    graph_snippet: Tasks diversity-weighted (1/sqrt(n))
+  - weight_col: null
+    graph_snippet: "None"
+
+stages:
+  filter_aird_runs:
+    task_families:
+      - ai_rd_fix_embedding
+      - ai_rd_nanogpt_chat_rl
+      - ai_rd_optimize_llm_foundry
+      - ai_rd_restricted_mlm
+      - ai_rd_rust_codecontests_inference
+      - ai_rd_small_scaling_law
+      - ai_rd_triton_cumsum
+
+rebench_best_of_k_parameters:
+  time_limits: [36000]
+  max_time_limit_in_seconds: 36000
+
+plots:
+  colors:
+    agent_aliases:
+      # Anthropic models - purple family
+      "Claude 3.5 Sonnet (New)":
+        light: "#B784ED"
+        base: "#8B4DC9"
+        dark: "#5F2B94"
+      "Claude 3.5 Sonnet (Old)":
+        light: "#D4B6F2"
+        base: "#9B6BE0"
+        dark: "#6B3DB0"
+      "Claude 3 Opus":
+        light: "#E5D4F7"
+        base: "#B594E8"
+        dark: "#7A5BA6"
+
+      # OpenAI GPT-4 models - blue family
+      "GPT-4o":
+        light: "#45B3D6"
+        base: "#2B8FB0"
+        dark: "#1A5668"
+      "GPT-4 Turbo":
+        light: "#7CC3DB"
+        base: "#4A9CBD"
+        dark: "#2C6B8F"
+      "GPT-4 0314":
+        light: "#ADD8E6"
+        base: "#87CEEB"
+        dark: "#4682B4"
+
+      # OpenAI older models - lighter blues
+      "davinci-002":
+        light: "#E0F3FF"
+        base: "#B3E0FF"
+        dark: "#80C4FF"
+      "gpt-3.5-turbo-instruct":
+        light: "#F0F8FF"
+        base: "#CCE6FF"
+        dark: "#99CCFF"
+
+      # OpenAI reasoning models - green family
+      "o1":
+        light: "#90EE90" # Light green
+        base: "#228B22" # Forest green
+        dark: "#006400" # Dark green
+      "o1-preview":
+        light: "#98FB98" # Light green
+        base: "#3CB371" # Medium sea green
+        dark: "#2E8B57" # Sea green
+
+      # Human baseline - grays
+      "human":
+        light: "#c9c9c9"
+        base: "#858585"
+        dark: "#484848"
+    default: "#000000"
+
+  legend_order:
+    - Claude 3 Opus
+    - Claude 3.5 Sonnet (New)
+    - Claude 3.5 Sonnet (Old)
+    - GPT-4 Turbo
+    - GPT-4 0314
+    - GPT-4o
+    - davinci
+    - gpt2
+    - o1-preview
+    - o1
+    - Human 8-hour score
